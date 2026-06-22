@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Motor genérico de distribución espacial de figuras 2D para optimización de sistemas agroforestales interlineados.">
+  <title>Motor de Distribución Espacial 2D — Agroforestal</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app-layout">
+    
+    <!-- ============ SIDEBAR ============ -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1>⬡ Motor de Distribución 2D</h1>
+        <div class="subtitle">Optimización Agroforestal Interlineada</div>
+      </div>
+      
+      <div class="sidebar-content">
+        
+        <!-- Terreno -->
+        <div class="section">
+          <div class="section-title">Terreno</div>
+          
+          <div class="control-group">
+            <div class="control-label">
+              <span>Forma del terreno</span>
+            </div>
+            <select id="terrain-shape">
+              <option value="rectangle">Rectángulo</option>
+              <option value="irregular">Polígono Irregular</option>
+              <option value="l-shape">Forma en L</option>
+              <option value="trapezoid">Trapecio</option>
+            </select>
+          </div>
+          
+          <div class="control-group">
+            <div class="control-label">
+              <span>Ancho (m)</span>
+              <span class="value" id="terrain-width-value">120m</span>
+            </div>
+            <input type="range" id="terrain-width" min="40" max="300" value="120" step="5" data-unit="m">
+          </div>
+          
+          <div class="control-group">
+            <div class="control-label">
+              <span>Alto (m)</span>
+              <span class="value" id="terrain-height-value">80m</span>
+            </div>
+            <input type="range" id="terrain-height" min="30" max="200" value="80" step="5" data-unit="m">
+          </div>
+        </div>
+        
+        <!-- Camino -->
+        <div class="section">
+          <div class="section-title">Camino Peatonal</div>
+          
+          <div class="control-group">
+            <div class="control-label">
+              <span>Trazado</span>
+            </div>
+            <select id="path-style">
+              <option value="curved" selected>Curvo</option>
+              <option value="straight">Recto</option>
+              <option value="diagonal">Diagonal</option>
+              <option value="zigzag">Zigzag</option>
+            </select>
+          </div>
+          
+          <div class="control-group">
+            <div class="control-label">
+              <span>Ancho del camino (m)</span>
+              <span class="value" id="path-width-value">3m</span>
+            </div>
+            <input type="range" id="path-width" min="1" max="8" value="3" step="0.5" data-unit="m">
+          </div>
+        </div>
+        
+        <!-- Restricciones de Distancia -->
+        <div class="section">
+          <div class="section-title">Restricciones de Distancia</div>
+          
+          <div class="control-group">
+            <div class="control-label">
+              <span>🌳 Mangostán ↔ Mangostán</span>
+              <span class="value" id="dist-aa-value">15m</span>
+            </div>
+            <input type="range" id="dist-aa" min="5" max="30" value="15" step="1" data-unit="m">
+          </div>
+          
+          <div class="control-group">
+            <div class="control-label">
+              <span>🌱 Cacao ↔ Cacao</span>
+              <span class="value" id="dist-bb-value">4m</span>
+            </div>
+            <input type="range" id="dist-bb" min="2" max="10" value="4" step="0.5" data-unit="m">
+          </div>
+          
+          <div class="control-group">
+            <div class="control-label">
+              <span>🌳 Mangostán ↔ 🌱 Cacao</span>
+              <span class="value" id="dist-ab-value">5m</span>
+            </div>
+            <input type="range" id="dist-ab" min="2" max="15" value="5" step="0.5" data-unit="m">
+          </div>
+        </div>
+        
+        <!-- Algoritmo -->
+        <div class="section">
+          <div class="section-title">Algoritmo</div>
+          
+          <div class="toggle-wrapper">
+            <label for="optimize-rotation">Optimizar rotación hexagonal</label>
+            <input type="checkbox" id="optimize-rotation" class="toggle" checked>
+          </div>
+          
+          <div class="control-group" style="margin-top: 8px;">
+            <div class="control-label">
+              <span>Semilla (vacío = aleatorio)</span>
+            </div>
+            <input type="number" id="seed" placeholder="Ej: 42">
+          </div>
+        </div>
+        
+        <!-- Visualización -->
+        <div class="section">
+          <div class="section-title">Visualización</div>
+          
+          <div class="toggle-wrapper">
+            <label for="toggle-canopy">Mostrar copas / radios</label>
+            <input type="checkbox" id="toggle-canopy" class="toggle" checked>
+          </div>
+          
+          <div class="toggle-wrapper">
+            <label for="toggle-grid">Mostrar grilla de referencia</label>
+            <input type="checkbox" id="toggle-grid" class="toggle">
+          </div>
+        </div>
+        
+        <!-- Acciones -->
+        <div class="section">
+          <div class="btn-group" style="margin-bottom: 8px;">
+            <button id="btn-run" class="btn btn-primary btn-block">
+              ▶ Ejecutar Distribución
+            </button>
+          </div>
+          <div class="btn-group">
+            <button id="btn-reset" class="btn btn-secondary" style="flex:1">
+              ↺ Reset
+            </button>
+            <button id="btn-export" class="btn btn-success" style="flex:1">
+              ↓ GeoJSON
+            </button>
+            <button id="btn-export-config" class="btn btn-secondary" style="flex:1">
+              ↓ Config
+            </button>
+          </div>
+        </div>
+        
+        <!-- Fases del Algoritmo -->
+        <div class="section">
+          <div class="section-title">Fases del Algoritmo</div>
+          <div id="algorithm-phases"></div>
+        </div>
+        
+      </div>
+      
+      <!-- Stats Footer -->
+      <div class="stats-panel">
+        <div class="section-title" style="margin-bottom: 8px;">Estadísticas</div>
+        
+        <div class="stat-row">
+          <span class="stat-label">Área del terreno</span>
+          <span class="stat-value" id="stat-terrain-area">—</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Zona de exclusión</span>
+          <span class="stat-value" id="stat-exclusion-area">—</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Área plantable neta</span>
+          <span class="stat-value" id="stat-plantable-area">—</span>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <div class="stat-row">
+          <span class="stat-label">Total elementos</span>
+          <span class="stat-value" id="stat-total-elements">—</span>
+        </div>
+        
+        <div id="type-stats" style="margin-top: 4px;"></div>
+        
+        <div class="divider"></div>
+        
+        <div class="stat-row">
+          <span class="stat-label">Tiempo de ejecución</span>
+          <span class="stat-value" id="stat-exec-time">—</span>
+        </div>
+      </div>
+    </aside>
+    
+    <!-- ============ CANVAS AREA ============ -->
+    <main class="canvas-container" id="canvas-container">
+      <canvas id="main-canvas"></canvas>
+      
+      <div class="canvas-overlay">
+        <!-- Status Badge -->
+        <div id="engine-status" class="engine-status status-processing">
+          <span class="status-icon">⏳</span> Inicializando...
+        </div>
+        
+        <!-- Legend -->
+        <div class="legend">
+          <div class="legend-title">Leyenda</div>
+          <div class="legend-item">
+            <span class="legend-dot" style="background: #10b981;"></span>
+            <span>Mangostán (Grilla Hex.)</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot" style="background: #f59e0b;"></span>
+            <span>Cacao (Poisson Disc)</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-line" style="background: #22c55e;"></span>
+            <span>Perímetro del terreno</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-hatch" style="border-color: #ef4444; background: rgba(239,68,68,0.1);"></span>
+            <span>Zona de exclusión</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-line" style="background: #fbbf24; border-style: dashed;"></span>
+            <span>Camino peatonal</span>
+          </div>
+        </div>
+        
+        <!-- Zoom Controls -->
+        <div class="zoom-controls">
+          <button id="btn-zoom-in" title="Acercar">+</button>
+          <div class="separator"></div>
+          <button id="btn-zoom-out" title="Alejar">−</button>
+          <div class="separator"></div>
+          <button id="btn-zoom-fit" title="Ajustar vista">⊡</button>
+        </div>
+      </div>
+    </main>
+    
+  </div>
+  
+  <!-- App Script -->
+  <script type="module" src="js/ui.js"></script>
+</body>
+</html>

@@ -175,6 +175,20 @@ export class UIController {
     const distBB = getValue('dist-bb', 4);
     const distAB = getValue('dist-ab', 5);
 
+    // Cantidad de elementos (límites opcionales)
+    const limitMangostan = document.getElementById('limit-mangostan')?.checked ?? false;
+    const limitCacao = document.getElementById('limit-cacao')?.checked ?? false;
+    const qtyMangostan = limitMangostan ? (parseInt(document.getElementById('qty-mangostan')?.value) || null) : null;
+    const qtyCacao = limitCacao ? (parseInt(document.getElementById('qty-cacao')?.value) || null) : null;
+
+    // Construir elementTypes con maxCount del usuario
+    const elementTypes = DEFAULT_CONFIG.elementTypes.map(et => {
+      const copy = { ...et };
+      if (et.id === 'mangostan') copy.maxCount = qtyMangostan;
+      if (et.id === 'cacao') copy.maxCount = qtyCacao;
+      return copy;
+    });
+
     // Algoritmo
     const optimizeRotation = document.getElementById('optimize-rotation')?.checked ?? true;
     const seedEl = document.getElementById('seed');
@@ -183,7 +197,7 @@ export class UIController {
     return {
       terrain: finalTerrain,
       path: { points: pathPoints, width: pathWidth },
-      elementTypes: DEFAULT_CONFIG.elementTypes,
+      elementTypes,
       distanceConstraints: [
         { typeA: 'mangostan', typeB: 'mangostan', distance: distAA },
         { typeA: 'cacao', typeB: 'cacao', distance: distBB },
@@ -245,6 +259,23 @@ export class UIController {
     const exportConfigBtn = document.getElementById('btn-export-config');
     if (exportConfigBtn) {
       exportConfigBtn.addEventListener('click', () => this._exportConfig());
+    }
+
+    // Quantity limit toggles
+    const limitMangostanToggle = document.getElementById('limit-mangostan');
+    const limitCacaoToggle = document.getElementById('limit-cacao');
+    const qtyMangostanRow = document.getElementById('qty-mangostan-row');
+    const qtyCacaoRow = document.getElementById('qty-cacao-row');
+
+    if (limitMangostanToggle && qtyMangostanRow) {
+      limitMangostanToggle.addEventListener('change', (e) => {
+        qtyMangostanRow.style.display = e.target.checked ? 'flex' : 'none';
+      });
+    }
+    if (limitCacaoToggle && qtyCacaoRow) {
+      limitCacaoToggle.addEventListener('change', (e) => {
+        qtyCacaoRow.style.display = e.target.checked ? 'flex' : 'none';
+      });
     }
 
     // Sliders con valor visible
@@ -355,6 +386,27 @@ export class UIController {
         setTextContent(`stat-density-${type}`, `${density} /ha`);
       }
     }
+
+    // Actualizar hints de cantidad disponible
+    this._updateQuantityHints(stats.elementsByType);
+  }
+
+  /**
+   * Actualiza los hints que muestran cuántos elementos caben sin límite
+   */
+  _updateQuantityHints(elementsByType) {
+    const hintMap = {
+      'mangostan': 'qty-mangostan-hint',
+      'cacao': 'qty-cacao-hint'
+    };
+
+    for (const [type, hintId] of Object.entries(hintMap)) {
+      const hintEl = document.getElementById(hintId);
+      if (hintEl) {
+        const count = elementsByType[type] || 0;
+        hintEl.textContent = `máx. disponible: ${count}`;
+      }
+    }
   }
 
   /**
@@ -384,6 +436,16 @@ export class UIController {
     
     const pathSelect = document.getElementById('path-style');
     if (pathSelect) pathSelect.value = 'curved';
+
+    // Reset quantity toggles
+    const limitMangostan = document.getElementById('limit-mangostan');
+    const limitCacao = document.getElementById('limit-cacao');
+    if (limitMangostan) { limitMangostan.checked = false; }
+    if (limitCacao) { limitCacao.checked = false; }
+    const qtyMangostanRow = document.getElementById('qty-mangostan-row');
+    const qtyCacaoRow = document.getElementById('qty-cacao-row');
+    if (qtyMangostanRow) qtyMangostanRow.style.display = 'none';
+    if (qtyCacaoRow) qtyCacaoRow.style.display = 'none';
   }
 
   /**

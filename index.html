@@ -113,6 +113,33 @@
           </div>
         </div>
         
+        <!-- Cantidad de Elementos -->
+        <div class="section">
+          <div class="section-title">Cantidad de Elementos</div>
+          
+          <div class="control-group">
+            <div class="toggle-wrapper">
+              <label for="limit-mangostan">🌳 Limitar Mangostán</label>
+              <input type="checkbox" id="limit-mangostan" class="toggle">
+            </div>
+            <div class="quantity-input-row" id="qty-mangostan-row" style="display: none;">
+              <input type="number" id="qty-mangostan" min="1" max="500" value="10" placeholder="Cantidad">
+              <span class="qty-hint" id="qty-mangostan-hint">máx. disponible: —</span>
+            </div>
+          </div>
+          
+          <div class="control-group">
+            <div class="toggle-wrapper">
+              <label for="limit-cacao">🌱 Limitar Cacao</label>
+              <input type="checkbox" id="limit-cacao" class="toggle">
+            </div>
+            <div class="quantity-input-row" id="qty-cacao-row" style="display: none;">
+              <input type="number" id="qty-cacao" min="1" max="2000" value="100" placeholder="Cantidad">
+              <span class="qty-hint" id="qty-cacao-hint">máx. disponible: —</span>
+            </div>
+          </div>
+        </div>
+        
         <!-- Algoritmo -->
         <div class="section">
           <div class="section-title">Algoritmo</div>
